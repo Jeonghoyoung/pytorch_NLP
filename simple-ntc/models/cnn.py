@@ -51,7 +51,7 @@ class CNNClassifier(nn.Module):
 
         min_length = max(self.window_sizes)
         if min_length > x.size(1):
-            pad =  x.new(x.size(0), min_length - x.size(1), self.word_vec_size).zero_()
+            pad = x.new(x.size(0), min_length - x.size(1), self.word_vec_size).zero_()
             x = torch.cat([x, pad], dim=-1)
 
         x = x.unsqueeze(1)
