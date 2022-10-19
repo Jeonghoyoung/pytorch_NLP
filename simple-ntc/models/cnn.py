@@ -47,14 +47,24 @@ class CNNClassifier(nn.Module):
         self.activation = nn.LogSoftmax(dim=-1)
 
     def forward(self, x):
+        # |x| = (batch_size, length)
         x = self.emb(x)
 
+        # |x| = (batch_size, length, word_vec_dim)
         min_length = max(self.window_sizes)
         if min_length > x.size(1):
+            # Because some input does not long enough for maximum length of window size
+            # we add zero tensor for padding
             pad = x.new(x.size(0), min_length - x.size(1), self.word_vec_size).zero_()
+            # |pad| = (batch_size, min_length - length, word_vec_dim)
             x = torch.cat([x, pad], dim=-1)
+            # |x| = (batch_size, min_length, word_vec_dim)
 
+        # In ordinary case of vision task, you may have 3 channels in tensor,
+        # but in this case, you would have just 1 channel,
+        # which is added by 'unsqueeze' method in below:
         x = x.unsqueeze(1)
+        # |x| = (batch_size, 1, length, word_vec_dim)
         cnn_outs = []
 
         for block in self.feature_extractors:
